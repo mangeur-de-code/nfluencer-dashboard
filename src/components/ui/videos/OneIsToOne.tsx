@@ -1,9 +1,14 @@
-export default function OneIsToOne() {
+interface OneIsToOneProps {
+  videoUrl: string;
+  title?: string;
+}
+
+export default function OneIsToOne({ videoUrl, title = "Video" }: OneIsToOneProps) {
   return (
     <div className="overflow-hidden rounded-lg aspect-square">
       <iframe
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="YouTube video"
+        src={videoUrl}
+        title={title}
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen

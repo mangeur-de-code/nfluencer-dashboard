@@ -1,9 +1,14 @@
-export default function TwentyOneIsToNine() {
+interface TwentyOneIsToNineProps {
+  videoUrl: string;
+  title?: string;
+}
+
+export default function TwentyOneIsToNine({ videoUrl, title = "Video" }: TwentyOneIsToNineProps) {
   return (
     <div className="aspect-21/9 overflow-hidden rounded-lg">
       <iframe
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="YouTube video"
+        src={videoUrl}
+        title={title}
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen

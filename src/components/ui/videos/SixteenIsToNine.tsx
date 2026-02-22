@@ -1,9 +1,14 @@
-export default function SixteenIsToNine() {
+interface SixteenIsToNineProps {
+  videoUrl: string;
+  title?: string;
+}
+
+export default function SixteenIsToNine({ videoUrl, title = "Video" }: SixteenIsToNineProps) {
   return (
     <div className="aspect-4/3 overflow-hidden rounded-lg">
       <iframe
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="YouTube video"
+        src={videoUrl}
+        title={title}
         frameBorder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
