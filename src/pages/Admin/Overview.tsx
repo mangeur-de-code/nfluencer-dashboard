@@ -39,6 +39,13 @@ type OverviewData = {
     churn: Array<{ date: string; value: number }>;
     contentMix: Array<{ label: string; value: number }>;
   };
+  analytics?: {
+    totalMinutesViewed: number;
+    topCountries: Array<{ country: string; minutesViewed: number }>;
+    analyticsByDate: Array<{ date: string; minutesViewed: number }>;
+    topVideos: Array<{ videoUid: string; minutesViewed: number }>;
+    topCreators: Array<{ creatorId: string; minutesViewed: number; videoCount: number; topCountry?: string }>;
+  };
 };
 
 const fallbackData: OverviewData = {
@@ -66,6 +73,13 @@ const fallbackData: OverviewData = {
       { label: "Audio", value: 0 },
       { label: "Text", value: 0 },
     ],
+  },
+  analytics: {
+    totalMinutesViewed: 0,
+    topCountries: [],
+    analyticsByDate: [],
+    topVideos: [],
+    topCreators: [],
   },
 };
 
@@ -309,6 +323,165 @@ export default function Overview() {
             </div>
           </div>
         </SectionCard>
+      </div>
+
+      {/* Stream Analytics Section */}
+      <div className="mt-6">
+        <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
+          Stream Analytics
+        </h2>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <StatCard
+            label="Total Minutes Viewed"
+            value={data.analytics?.totalMinutesViewed?.toLocaleString() || "0"}
+            icon={<VideoIcon className="text-gray-800 size-6 dark:text-white/90" />}
+          />
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <SectionCard title="Top Countries" subtitle="Minutes viewed by geography">
+            {data.analytics?.topCountries && data.analytics.topCountries.length > 0 ? (
+              <div className="space-y-2">
+                {data.analytics.topCountries.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-300">{item.country}</span>
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                        <div
+                          className="h-full bg-blue-500"
+                          style={{
+                            width: `${(item.minutesViewed /
+                                (data.analytics?.topCountries[0]?.minutesViewed || 1)) *
+                              100
+                              }%`,
+                          }}
+                        />
+                      </div>
+                      <span className="w-20 text-right font-semibold text-gray-800 dark:text-white/90">
+                        {item.minutesViewed.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                No geographic data available yet.
+              </div>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Top Videos" subtitle="Most watched streams">
+            {data.analytics?.topVideos && data.analytics.topVideos.length > 0 ? (
+              <div className="space-y-2">
+                {data.analytics.topVideos.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-sm">
+                    <span className="truncate text-gray-600 dark:text-gray-300">
+                      {item.videoUid.substring(0, 16)}...
+                    </span>
+                    <span className="font-semibold text-gray-800 dark:text-white/90">
+                      {item.minutesViewed.toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                No video data available yet.
+              </div>
+            )}
+          </SectionCard>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <SectionCard title="Top Creators" subtitle="Creators by engagement">
+            {data.analytics?.topCreators && data.analytics.topCreators.length > 0 ? (
+              <div className="space-y-3">
+                {data.analytics.topCreators.map((item, idx) => (
+                  <div key={idx} className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-semibold text-gray-800 dark:text-white/90">
+                          Creator {item.creatorId.substring(0, 8)}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          {item.videoCount} video{item.videoCount !== 1 ? "s" : ""} • {item.topCountry || "Global"}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-semibold text-blue-600 dark:text-blue-400">
+                          {(item.minutesViewed / 1000).toFixed(1)}k
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          minutes
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                      <div
+                        className="h-full bg-gradient-to-r from-purple-400 to-purple-600"
+                        style={{
+                          width: `${(item.minutesViewed /
+                              (data.analytics.topCreators[0]?.minutesViewed || 1)) *
+                            100
+                            }%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                No creator data available yet.
+              </div>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Stream Activity Trend" subtitle="Minutes viewed over time">
+            {data.analytics?.analyticsByDate && data.analytics.analyticsByDate.length > 0 ? (
+              <div className="space-y-3">
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  Daily minutes viewed across all streams
+                </div>
+                <div className="space-y-1">
+                  {data.analytics.analyticsByDate.map((item, idx) => {
+                    const maxMinutes = Math.max(
+                      ...data.analytics!.analyticsByDate.map((d) => d.minutesViewed)
+                    );
+                    const percentage = (item.minutesViewed / (maxMinutes || 1)) * 100;
+                    return (
+                      <div key={idx} className="flex items-center justify-between text-sm">
+                        <span className="w-20 text-gray-600 dark:text-gray-300">
+                          {new Date(item.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </span>
+                        <div className="flex flex-1 items-center gap-2 px-3">
+                          <div className="h-6 flex-1 overflow-hidden rounded bg-gray-100 dark:bg-gray-700">
+                            <div
+                              className="h-full bg-gradient-to-r from-blue-400 to-blue-600"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                        <span className="w-24 text-right font-semibold text-gray-800 dark:text-white/90">
+                          {item.minutesViewed.toLocaleString()}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                No time-series data available yet.
+              </div>
+            )}
+          </SectionCard>
+        </div>
       </div>
     </>
   );
