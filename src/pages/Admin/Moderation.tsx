@@ -25,6 +25,9 @@ type ModerationData = {
         timeToResolveHours: number;
         flaggedContent: number;
         autoActions: number;
+        pendingVerifications: number;
+        activeSuspensions: number;
+        openAppeals: number;
     };
     recentReports: Array<{
         id: number;
@@ -41,6 +44,9 @@ const fallback: ModerationData = {
         timeToResolveHours: 0,
         flaggedContent: 0,
         autoActions: 0,
+        pendingVerifications: 0,
+        activeSuspensions: 0,
+        openAppeals: 0,
     },
     recentReports: [],
 };
@@ -158,6 +164,21 @@ export default function Moderation() {
                 <StatCard
                     label="Active Rules"
                     value={metrics.autoActions}
+                    icon={<AlertHexaIcon className="text-gray-800 size-6 dark:text-white/90" />}
+                />
+                <StatCard
+                    label="Pending Verifications"
+                    value={metrics.pendingVerifications}
+                    icon={<AlertHexaIcon className="text-gray-800 size-6 dark:text-white/90" />}
+                />
+                <StatCard
+                    label="Active Suspensions"
+                    value={metrics.activeSuspensions}
+                    icon={<AlertHexaIcon className="text-gray-800 size-6 dark:text-white/90" />}
+                />
+                <StatCard
+                    label="Open Appeals"
+                    value={metrics.openAppeals}
                     icon={<AlertHexaIcon className="text-gray-800 size-6 dark:text-white/90" />}
                 />
             </div>

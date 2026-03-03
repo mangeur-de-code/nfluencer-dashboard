@@ -14,6 +14,8 @@ type SystemData = {
     dbLatencyP95Ms: number;
     jobFailures: number;
     emailFailures: number;
+    openChargebacks: number;
+    openComplianceRequests: number;
   };
 };
 
@@ -25,6 +27,8 @@ const fallback: SystemData = {
     dbLatencyP95Ms: 0,
     jobFailures: 0,
     emailFailures: 0,
+    openChargebacks: 0,
+    openComplianceRequests: 0,
   },
 };
 
@@ -108,6 +112,16 @@ export default function System() {
         <StatCard
           label="Email Failures"
           value={metrics.emailFailures}
+          icon={<BoltIcon className="text-gray-800 size-6 dark:text-white/90" />}
+        />
+        <StatCard
+          label="Open Chargebacks"
+          value={metrics.openChargebacks}
+          icon={<BoltIcon className="text-gray-800 size-6 dark:text-white/90" />}
+        />
+        <StatCard
+          label="Compliance Requests"
+          value={metrics.openComplianceRequests}
           icon={<BoltIcon className="text-gray-800 size-6 dark:text-white/90" />}
         />
       </div>
