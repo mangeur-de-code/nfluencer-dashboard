@@ -26,38 +26,57 @@ export default function Creators() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading"
   );
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  const loadCreators = async (mounted: { current: boolean }) => {
+    setStatus("loading");
+    try {
+      const response = await fetchAdmin<{ creators: CreatorRow[] }>(
+        "/api/admin/creators",
+        { start: range.start, end: range.end, range: range.key }
+      );
+      if (mounted.current) {
+        setRows(response.creators || []);
+        setStatus("ready");
+      }
+    } catch {
+      if (mounted.current) {
+        setRows([]);
+        setStatus("error");
+      }
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    const load = async () => {
-      setStatus("loading");
-      try {
-        const response = await fetchAdmin<{ creators: CreatorRow[] }>(
-          "/api/admin/creators",
-          {
-            start: range.start,
-            end: range.end,
-            range: range.key,
-          }
-        );
-        if (isMounted) {
-          setRows(response.creators || []);
-          setStatus("ready");
-        }
-      } catch (error) {
-        if (isMounted) {
-          setRows([]);
-          setStatus("error");
-        }
-      }
-    };
-
-    load();
-
-    return () => {
-      isMounted = false;
-    };
+    const mounted = { current: true };
+    loadCreators(mounted);
+    return () => { mounted.current = false; };
   }, [range]);
+
+  const handleVerify = async (creatorId: number, approved: boolean) => {
+    const label = approved ? "verify" : "reject";
+    if (!confirm(`Are you sure you want to ${label} this creator?`)) return;
+
+    setActionLoading(creatorId);
+    try {
+      const res = await fetch("/api/admin/verify-creator", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ creatorId, approved }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert((err as any).error || `Failed to ${label} creator`);
+      } else {
+        const mounted = { current: true };
+        await loadCreators(mounted);
+      }
+    } catch {
+      alert(`Error: could not ${label} creator`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     if (!query) return rows;
@@ -117,6 +136,7 @@ export default function Creators() {
                 <th className="px-4 py-3">Tips</th>
                 <th className="px-4 py-3">Revenue</th>
                 <th className="px-4 py-3">Last Activity</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -141,12 +161,36 @@ export default function Creators() {
                     {row.revenue ? `$${row.revenue.toLocaleString()}` : "—"}
                   </td>
                   <td className="px-4 py-3">{row.lastActivity ?? "—"}</td>
+                  <td className="px-4 py-3">
+                    {row.verified ? (
+                      <span className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                        ✓ Verified
+                      </span>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleVerify(row.id, true)}
+                          disabled={actionLoading === row.id}
+                          className="rounded px-2 py-1 text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 disabled:opacity-40 transition"
+                        >
+                          Verify
+                        </button>
+                        <button
+                          onClick={() => handleVerify(row.id, false)}
+                          disabled={actionLoading === row.id}
+                          className="rounded px-2 py-1 text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 disabled:opacity-40 transition"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={9}
                     className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
                   >
                     {status === "loading"

@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import StatCard from "../../components/admin/StatCard";
+import AreaChart from "../../components/admin/charts/AreaChart";
 import { fetchAdmin } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { DollarLineIcon } from "../../icons";
@@ -16,6 +17,9 @@ type RevenueData = {
     payoutsCompleted: number;
     refunds: number;
   };
+  series?: {
+    revenueByDay: Array<{ date: string; amount: number }>;
+  };
 };
 
 const fallback: RevenueData = {
@@ -28,6 +32,7 @@ const fallback: RevenueData = {
     payoutsCompleted: 0,
     refunds: 0,
   },
+  series: { revenueByDay: [] },
 };
 
 export default function Revenue() {
@@ -67,6 +72,15 @@ export default function Revenue() {
   }, [range]);
 
   const { metrics } = data;
+
+  const revenueCategories = useMemo(
+    () => (data.series?.revenueByDay ?? []).map((d) => d.date),
+    [data.series]
+  );
+  const revenueSeries = useMemo(
+    () => [{ name: "Revenue", data: (data.series?.revenueByDay ?? []).map((d) => d.amount) }],
+    [data.series]
+  );
 
   return (
     <>
@@ -124,15 +138,22 @@ export default function Revenue() {
 
       <div className="mt-6">
         <SectionCard
-          title="Revenue Notes"
+          title="Daily Revenue Trend"
           subtitle={
-            status === "error" ? "Live data unavailable." : "Provide payout statuses and net earnings."
+            status === "error"
+              ? "Live data unavailable."
+              : revenueCategories.length > 0
+              ? `${revenueCategories.length} days of data`
+              : "No transactions in this range"
           }
         >
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Use earnings and payout transactions to compute gross revenue, fees,
-            and payout states.
-          </p>
+          {revenueCategories.length > 0 ? (
+            <AreaChart categories={revenueCategories} series={revenueSeries} />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No revenue data available for the selected date range.
+            </p>
+          )}
         </SectionCard>
       </div>
     </>

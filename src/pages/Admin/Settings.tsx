@@ -23,22 +23,52 @@ export default function Settings() {
 
     const [saved, setSaved] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [initLoading, setInitLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Load settings from API on mount
+    useEffect(() => {
+        const load = async () => {
+            setInitLoading(true);
+            try {
+                const res = await fetch("/api/admin/settings");
+                if (res.ok) {
+                    const json = await res.json() as { settings: PlatformSettings };
+                    if (json.settings) setSettings(json.settings);
+                }
+            } catch {
+                // Keep defaults if load fails
+            } finally {
+                setInitLoading(false);
+            }
+        };
+        load();
+    }, []);
 
     const handleChange = (key: keyof PlatformSettings, value: any) => {
         setSettings({ ...settings, [key]: value });
         setSaved(false);
+        setError(null);
     };
 
     const handleSave = async () => {
         setLoading(true);
+        setError(null);
         try {
-            // TODO: Call API to save settings
-            await new Promise((resolve) => setTimeout(resolve, 500));
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-        } catch (error) {
-            console.error("Error saving settings:", error);
-            alert("Failed to save settings");
+            const res = await fetch("/api/admin/settings", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(settings),
+            });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                setError((err as any).error || "Failed to save settings");
+            } else {
+                setSaved(true);
+                setTimeout(() => setSaved(false), 3000);
+            }
+        } catch {
+            setError("Network error saving settings");
         } finally {
             setLoading(false);
         }
@@ -49,11 +79,16 @@ export default function Settings() {
             return;
         }
         try {
-            // TODO: Call API to clear cache
-            alert("Cache cleared successfully");
-        } catch (error) {
-            console.error("Error clearing cache:", error);
-            alert("Failed to clear cache");
+            const res = await fetch("/api/admin/clear-cache", { method: "POST" });
+            if (res.ok) {
+                const json = await res.json() as { deleted?: number };
+                alert(`Cache cleared successfully. ${json.deleted ?? 0} keys removed.`);
+            } else {
+                const err = await res.json().catch(() => ({}));
+                alert((err as any).error || "Failed to clear cache");
+            }
+        } catch {
+            alert("Network error clearing cache");
         }
     };
 
@@ -69,6 +104,10 @@ export default function Settings() {
                     Configure platform-wide settings and features
                 </p>
             </div>
+
+            {initLoading && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Loading settings...</p>
+            )}
 
             <div className="space-y-6 max-w-2xl">
                 {/* General Settings */}
@@ -172,7 +211,7 @@ export default function Settings() {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={handleSave}
-                        disabled={loading}
+                        disabled={loading || initLoading}
                         className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50 transition"
                     >
                         {loading ? "Saving..." : "Save Settings"}
@@ -180,6 +219,11 @@ export default function Settings() {
                     {saved && (
                         <span className="text-green-600 dark:text-green-400 text-sm">
                             ✓ Settings saved successfully
+                        </span>
+                    )}
+                    {error && (
+                        <span className="text-red-600 dark:text-red-400 text-sm">
+                            ✗ {error}
                         </span>
                     )}
                 </div>

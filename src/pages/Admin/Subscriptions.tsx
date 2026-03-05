@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import { fetchAdmin } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import StatCard from "../../components/admin/StatCard";
+import AreaChart from "../../components/admin/charts/AreaChart";
 import { PieChartIcon, UserCircleIcon } from "../../icons";
 
 type SubscriptionData = {
@@ -77,6 +78,18 @@ export default function Subscriptions() {
 
   const { metrics } = data;
 
+  const subDates = useMemo(
+    () => data.series.newByDay.map((d) => d.date),
+    [data.series.newByDay]
+  );
+  const subSeries = useMemo(
+    () => [
+      { name: "New", data: data.series.newByDay.map((d) => d.value) },
+      { name: "Churned", data: data.series.churnByDay.map((d) => d.value) },
+    ],
+    [data.series]
+  );
+
   return (
     <>
       <PageMeta
@@ -128,17 +141,22 @@ export default function Subscriptions() {
 
       <div className="mt-6">
         <SectionCard
-          title="Subscription Notes"
+          title="New vs Churned Subscriptions"
           subtitle={
             status === "error"
               ? "Live data unavailable."
-              : "Use the API to supply churn and cohort trends."
+              : subDates.length > 0
+              ? `${subDates.length} days of data`
+              : "No subscription activity in this range"
           }
         >
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Provide daily new subscriptions and churn counts in the admin API to
-            enable charts on this page.
-          </p>
+          {subDates.length > 0 ? (
+            <AreaChart categories={subDates} series={subSeries} />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No subscription data for the selected date range.
+            </p>
+          )}
         </SectionCard>
       </div>
     </>

@@ -25,38 +25,71 @@ export default function Users() {
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading"
   );
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
+
+  const loadUsers = async (mounted: { current: boolean }) => {
+    setStatus("loading");
+    try {
+      const response = await fetchAdmin<{ users: UserRow[] }>(
+        "/api/admin/users",
+        { start: range.start, end: range.end, range: range.key }
+      );
+      if (mounted.current) {
+        setRows(response.users || []);
+        setStatus("ready");
+      }
+    } catch {
+      if (mounted.current) {
+        setRows([]);
+        setStatus("error");
+      }
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    const load = async () => {
-      setStatus("loading");
-      try {
-        const response = await fetchAdmin<{ users: UserRow[] }>(
-          "/api/admin/users",
-          {
-            start: range.start,
-            end: range.end,
-            range: range.key,
-          }
-        );
-        if (isMounted) {
-          setRows(response.users || []);
-          setStatus("ready");
-        }
-      } catch (error) {
-        if (isMounted) {
-          setRows([]);
-          setStatus("error");
-        }
-      }
-    };
-
-    load();
-
-    return () => {
-      isMounted = false;
-    };
+    const mounted = { current: true };
+    loadUsers(mounted);
+    return () => { mounted.current = false; };
   }, [range]);
+
+  const handleUserAction = async (
+    userId: number,
+    action: "ban" | "promote" | "delete"
+  ) => {
+    const labels: Record<typeof action, string> = {
+      ban: "ban this user",
+      promote: "promote this user to admin",
+      delete: "permanently delete this user",
+    };
+    if (!confirm(`Are you sure you want to ${labels[action]}?`)) return;
+
+    const endpoints: Record<typeof action, string> = {
+      ban: "/api/admin/ban-user",
+      promote: "/api/admin/promote-user",
+      delete: "/api/admin/delete-user",
+    };
+
+    setActionLoading(userId);
+    try {
+      const res = await fetch(endpoints[action], {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert((err as any).error || `Failed to ${action} user`);
+      } else {
+        // Refresh the list
+        const mounted = { current: true };
+        await loadUsers(mounted);
+      }
+    } catch {
+      alert(`Error: could not ${action} user`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const filtered = useMemo(() => {
     if (!query) return rows;
@@ -114,6 +147,7 @@ export default function Users() {
                 <th className="px-4 py-3">Total Spend</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -133,15 +167,40 @@ export default function Users() {
                   </td>
                   <td className="px-4 py-3 capitalize">{row.status ?? "active"}</td>
                   <td className="px-4 py-3">{row.createdAt}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleUserAction(row.id, "ban")}
+                        disabled={actionLoading === row.id || row.status === "banned"}
+                        className="rounded px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 disabled:opacity-40 transition"
+                      >
+                        Ban
+                      </button>
+                      <button
+                        onClick={() => handleUserAction(row.id, "promote")}
+                        disabled={actionLoading === row.id || row.status === "admin"}
+                        className="rounded px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 disabled:opacity-40 transition"
+                      >
+                        Promote
+                      </button>
+                      <button
+                        onClick={() => handleUserAction(row.id, "delete")}
+                        disabled={actionLoading === row.id}
+                        className="rounded px-2 py-1 text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 disabled:opacity-40 transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
                   >
-                    {status === "loading"
+                  {status === "loading"
                       ? "Loading users..."
                       : "No users found for this range."}
                   </td>

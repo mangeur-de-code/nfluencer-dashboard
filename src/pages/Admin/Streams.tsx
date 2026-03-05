@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import StatCard from "../../components/admin/StatCard";
+import AreaChart from "../../components/admin/charts/AreaChart";
 import { fetchAdmin } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { VideoIcon } from "../../icons";
@@ -15,6 +16,10 @@ type StreamData = {
     streamErrors: number;
     chatMessages: number;
   };
+  series?: {
+    viewersByDay: Array<{ date: string; viewers: number }>;
+    watchTimeByDay: Array<{ date: string; minutes: number }>;
+  };
 };
 
 const fallback: StreamData = {
@@ -26,6 +31,7 @@ const fallback: StreamData = {
     streamErrors: 0,
     chatMessages: 0,
   },
+  series: { viewersByDay: [], watchTimeByDay: [] },
 };
 
 export default function Streams() {
@@ -65,6 +71,23 @@ export default function Streams() {
   }, [range]);
 
   const { metrics } = data;
+
+  const viewerDates = useMemo(
+    () => (data.series?.viewersByDay ?? []).map((d) => d.date),
+    [data.series]
+  );
+  const viewerSeries = useMemo(
+    () => [{ name: "Unique Viewers", data: (data.series?.viewersByDay ?? []).map((d) => d.viewers) }],
+    [data.series]
+  );
+  const watchDates = useMemo(
+    () => (data.series?.watchTimeByDay ?? []).map((d) => d.date),
+    [data.series]
+  );
+  const watchSeries = useMemo(
+    () => [{ name: "Watch Time (min)", data: (data.series?.watchTimeByDay ?? []).map((d) => d.minutes) }],
+    [data.series]
+  );
 
   return (
     <>
@@ -112,19 +135,31 @@ export default function Streams() {
         />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <SectionCard
-          title="Stream Notes"
-          subtitle={
-            status === "error"
-              ? "Live data unavailable."
-              : "Use Cloudflare analytics + stream_views for trends."
-          }
+          title="Daily Viewers Trend"
+          subtitle={viewerDates.length > 0 ? `${viewerDates.length} days` : "No data in range"}
         >
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Combine Cloudflare Stream analytics with local stream view data to
-            calculate peak viewers, watch time, and chat activity.
-          </p>
+          {viewerDates.length > 0 ? (
+            <AreaChart categories={viewerDates} series={viewerSeries} height={240} />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No viewer data for the selected range.
+            </p>
+          )}
+        </SectionCard>
+
+        <SectionCard
+          title="Daily Watch Time"
+          subtitle={watchDates.length > 0 ? `${watchDates.length} days` : "No data in range"}
+        >
+          {watchDates.length > 0 ? (
+            <AreaChart categories={watchDates} series={watchSeries} height={240} />
+          ) : (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No watch time data for the selected range.
+            </p>
+          )}
         </SectionCard>
       </div>
     </>
