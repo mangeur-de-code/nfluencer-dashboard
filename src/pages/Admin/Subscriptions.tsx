@@ -146,8 +146,8 @@ export default function Subscriptions() {
             status === "error"
               ? "Live data unavailable."
               : subDates.length > 0
-              ? `${subDates.length} days of data`
-              : "No subscription activity in this range"
+                ? `${subDates.length} days of data`
+                : "No subscription activity in this range"
           }
         >
           {subDates.length > 0 ? (

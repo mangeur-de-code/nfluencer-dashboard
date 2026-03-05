@@ -143,8 +143,8 @@ export default function Revenue() {
             status === "error"
               ? "Live data unavailable."
               : revenueCategories.length > 0
-              ? `${revenueCategories.length} days of data`
-              : "No transactions in this range"
+                ? `${revenueCategories.length} days of data`
+                : "No transactions in this range"
           }
         >
           {revenueCategories.length > 0 ? (
