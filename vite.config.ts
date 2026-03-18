@@ -25,4 +25,9 @@ export default defineConfig({
       },
     },
   },
+  base: "/dashboard/",
+  build: {
+    outDir: "../public/dashboard",
+    emptyOutDir: true,
+  },
 });

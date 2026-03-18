@@ -20,7 +20,7 @@ import Settings from "./pages/Admin/Settings";
 export default function App() {
   return (
     <>
-      <Router>
+      <Router basename="/dashboard">
         <ScrollToTop />
         <Routes>
           {/* Dashboard Layout */}
