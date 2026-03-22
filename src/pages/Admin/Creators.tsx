@@ -85,7 +85,11 @@ export default function Creators() {
   const pageRows = paged as unknown as CreatorRow[];
 
   const handleKycOverride = async (creatorId: number, kycStatus: string) => {
-    if (!window.confirm(`Set KYC status to "${kycStatus}" for this creator?`)) return;
+    const isDestructive = kycStatus !== "verified";
+    const message = isDestructive
+      ? `⚠️ Setting KYC to "${kycStatus}" will DISABLE creator mode and monetization for this creator.\n\nThey will lose access to the Monetization tab, subscription settings, and payouts until re-verified.\n\nAre you sure?`
+      : `Set KYC status to "verified" for this creator? This will enable creator mode and monetization.`;
+    if (!globalThis.confirm(message)) return;
     setActionLoading(creatorId);
     try {
       const res = await fetch("/api/admin/creators", {
