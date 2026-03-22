@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import StatCard from "../../components/admin/StatCard";
 import SectionCard from "../../components/admin/SectionCard";
@@ -182,7 +182,7 @@ export default function Overview() {
             Platform Overview
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {range.label} • {range.start} → {range.end}
+            {range.label} ΓÇó {range.start} ΓåÆ {range.end}
           </p>
         </div>
         {status === "error" ? (
@@ -406,7 +406,7 @@ export default function Overview() {
                           Creator {item.creatorId.substring(0, 8)}
                         </div>
                         <div className="text-xs text-gray-600 dark:text-gray-400">
-                          {item.videoCount} video{item.videoCount !== 1 ? "s" : ""} • {item.topCountry || "Global"}
+                          {item.videoCount} video{item.videoCount !== 1 ? "s" : ""} ΓÇó {item.topCountry || "Global"}
                         </div>
                       </div>
                       <div className="text-right">
@@ -423,7 +423,7 @@ export default function Overview() {
                         className="h-full bg-gradient-to-r from-purple-400 to-purple-600"
                         style={{
                           width: `${(item.minutesViewed /
-                              (data.analytics.topCreators[0]?.minutesViewed || 1)) *
+                              (data.analytics?.topCreators[0]?.minutesViewed || 1)) *
                             100
                             }%`,
                         }}

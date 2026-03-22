@@ -16,36 +16,39 @@ import System from "./pages/Admin/System";
 import AuditLog from "./pages/Admin/AuditLog";
 import Reports from "./pages/Admin/Reports";
 import Settings from "./pages/Admin/Settings";
+import { RbacProvider } from "./context/RbacContext";
 
 export default function App() {
   return (
     <>
       <Router basename="/dashboard">
-        <ScrollToTop />
-        <Routes>
-          {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/" element={<Overview />} />
-            <Route path="/users" element={<Users />} />
-            <Route path="/creators" element={<Creators />} />
-            <Route path="/content" element={<Content />} />
-            <Route path="/subscriptions" element={<Subscriptions />} />
-            <Route path="/revenue" element={<Revenue />} />
-            <Route path="/streams" element={<Streams />} />
-            <Route path="/moderation" element={<Moderation />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/system" element={<System />} />
-            <Route path="/audit-log" element={<AuditLog />} />
-          </Route>
+        <RbacProvider>
+          <ScrollToTop />
+          <Routes>
+            {/* Dashboard Layout */}
+            <Route element={<AppLayout />}>
+              <Route index path="/" element={<Overview />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/creators" element={<Creators />} />
+              <Route path="/content" element={<Content />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/revenue" element={<Revenue />} />
+              <Route path="/streams" element={<Streams />} />
+              <Route path="/moderation" element={<Moderation />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/system" element={<System />} />
+              <Route path="/audit-log" element={<AuditLog />} />
+            </Route>
 
-          {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
+            {/* Auth Layout */}
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
 
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            {/* Fallback Route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </RbacProvider>
       </Router>
     </>
   );

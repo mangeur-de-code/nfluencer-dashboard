@@ -37,7 +37,7 @@ const fallback: StreamData = {
 export default function Streams() {
   const { range } = useAdminDateRange();
   const [data, setData] = useState<StreamData>(fallback);
-  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+  const [_status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading"
   );
 
