@@ -17,17 +17,10 @@ export default defineConfig({
   ],
   server: {
     port: 5175,
-    proxy: {
-      "/api": {
-        target: "http://localhost:5173",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
   },
-  base: "/dashboard/",
+  base: "/",
   build: {
-    outDir: "../public/dashboard",
+    outDir: "dist",
     emptyOutDir: true,
   },
 });

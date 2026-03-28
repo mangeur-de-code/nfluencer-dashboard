@@ -4,14 +4,14 @@ export type AdminApiError = {
 };
 
 const getBaseUrl = () => {
-  // In development, use relative URLs so Vite proxy handles routing to the main app
-  // In production, use absolute URL if provided in env
+  // In production, VITE_ADMIN_API_BASE_URL must point to the admin microservice
+  // e.g. https://api-admin.nfluencer.co
   const envBase = import.meta.env.VITE_ADMIN_API_BASE_URL as string | undefined;
-  if (envBase && (import.meta.env.PROD || envBase !== "http://localhost:5173")) {
+  if (envBase) {
     return envBase.replace(/\/$/, "");
   }
-  // Use relative URLs to leverage Vite proxy -> no CORS issues
-  return "";
+  // In development, the admin service runs via `wrangler dev` on port 8788
+  return "http://localhost:8788";
 };
 
 const toQueryString = (params?: Record<string, string | number | undefined>) => {
