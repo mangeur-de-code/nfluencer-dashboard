@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && wrangler pages publish dist",
+    "deploy:production": "npm run build && wrangler pages publish dist --env production"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
@@ -47,7 +49,8 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.22.0",
     "vite": "^6.1.0",
-    "vite-plugin-svgr": "^4.3.0"
+    "vite-plugin-svgr": "^4.3.0",
+    "wrangler": "^3.105.0"
   },
   "overrides": {
     "react-helmet-async": {

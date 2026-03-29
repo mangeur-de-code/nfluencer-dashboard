@@ -1,0 +1,23 @@
+# nfluencer-dashboard — Cloudflare Pages
+#
+# Standalone admin dashboard SPA. Vite-built React application that communicates
+# with the admin microservice at api-admin.<DOMAIN>/api/v1/admin/*.
+#
+# Dev:        npm run dev               → http://localhost:5175
+# Deploy:     npm run deploy            → staging
+# Production: npm run deploy:production → production
+
+name = "nfluencer-dashboard"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+routes = [
+  { pattern = "dashboard.nfluencer.co", custom_domain = true }
+]
+
+[env.production.vars]
+VITE_API_BASE_URL = "https://api-admin.nfluencer.co"
+VITE_MAIN_APP_URL = "https://www.nfluencer.co"
+VITE_DOMAIN = "nfluencer.co"
