@@ -21,7 +21,7 @@ import { RbacProvider } from "./context/RbacContext";
 export default function App() {
   return (
     <>
-      <Router basename="/dashboard">
+      <Router basename="/">
         <RbacProvider>
           <ScrollToTop />
           <Routes>
