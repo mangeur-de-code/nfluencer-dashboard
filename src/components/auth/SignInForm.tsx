@@ -4,7 +4,9 @@ import Button from "../ui/button/Button";
 
 export default function SignInForm() {
   const handleSignIn = () => {
-    globalThis.location.href = "/auth/clerk-signin?redirect_url=/dashboard";
+    // Redirect to main app for Clerk authentication, then back to dashboard
+    const dashboardUrl = encodeURIComponent(globalThis.location.origin);
+    globalThis.location.href = `https://www.nfluencer.co/auth/clerk-signin?redirect_url=${dashboardUrl}`;
   };
 
   return (

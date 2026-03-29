@@ -94,7 +94,7 @@ export default function Users() {
   useEffect(() => { resetPage(); }, [query]);
 
   const pageRows = paged as unknown as UserRow[];
-  const allPageIds = pageRows.map((r) => r.id);
+  const allPageIds = (pageRows || []).map((r) => r.id);
   const allSelected = allPageIds.length > 0 && allPageIds.every((id) => selected.has(id));
 
   function toggleSelectAll() {

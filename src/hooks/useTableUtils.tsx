@@ -15,6 +15,8 @@ export function useSortedPaginatedData<T extends Record<string, unknown>>(
     const [page, setPage] = useState(1);
 
     const sorted = useMemo(() => {
+        // Add defensive check for undefined/null data
+        if (!data || !Array.isArray(data)) return [];
         if (!sort.key || !sort.dir) return data;
         const key = sort.key;
         return [...data].sort((a, b) => {
@@ -28,9 +30,9 @@ export function useSortedPaginatedData<T extends Record<string, unknown>>(
         });
     }, [data, sort]);
 
-    const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+    const totalPages = Math.max(1, Math.ceil((sorted?.length || 0) / pageSize));
     const safePage = Math.min(page, totalPages);
-    const paged = sorted.slice((safePage - 1) * pageSize, safePage * pageSize);
+    const paged = (sorted || []).slice((safePage - 1) * pageSize, safePage * pageSize);
 
     function toggleSort(key: string) {
         setSort((prev) => {
@@ -45,7 +47,7 @@ export function useSortedPaginatedData<T extends Record<string, unknown>>(
         setPage(1);
     }
 
-    return { sorted: paged, totalPages, page: safePage, setPage, sort, toggleSort, resetPage, totalCount: sorted.length };
+    return { sorted: paged, totalPages, page: safePage, setPage, sort, toggleSort, resetPage, totalCount: sorted?.length || 0 };
 }
 
 export function SortIcon({ active, dir }: { active: boolean; dir: SortDirection }) {

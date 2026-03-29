@@ -7,3 +7,7 @@
 name = "nfluencer-dashboard"
 pages_build_output_dir = "dist"
 compatibility_date = "2025-09-01"
+
+[env.production.vars]
+VITE_ADMIN_API_BASE_URL = "https://nfluencer-admin.dlouis20.workers.dev"
+VITE_MAIN_APP_URL = "https://www.nfluencer.co"

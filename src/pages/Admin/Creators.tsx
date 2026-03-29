@@ -92,18 +92,15 @@ export default function Creators() {
     if (!globalThis.confirm(message)) return;
     setActionLoading(creatorId);
     try {
-      const res = await fetch("/api/admin/creators", {
+      const res = await fetchAdmin<{ success?: boolean; error?: string }>("/api/admin/creators", {
         method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "override_kyc", userId: creatorId, kycStatus }),
       });
-      const data = await res.json() as { error?: string };
-      if (res.ok) {
+      if (res.success) {
         const mounted = { current: true };
         await loadCreators(mounted);
       } else {
-        alert(data.error || "Failed to override KYC status");
+        alert(res.error || "Failed to override KYC status");
       }
     } catch {
       alert("Error: could not update KYC status");
