@@ -6,7 +6,7 @@ export default function SignInForm() {
   const handleSignIn = () => {
     // Redirect to main app for Clerk authentication, then back to dashboard
     const dashboardUrl = encodeURIComponent(globalThis.location.origin);
-    globalThis.location.href = `https://www.nfluencer.co/auth/clerk-signin?redirect_url=${dashboardUrl}`;
+    globalThis.location.href = `https://www.fanzzer.com/auth/clerk-signin?redirect_url=${dashboardUrl}`;
   };
 
   return (

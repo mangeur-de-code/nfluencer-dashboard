@@ -29,14 +29,14 @@ jobs:
         env:
           # Clerk publishable key (safe to expose — it's a public key)
           VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
-          # Admin microservice URL (e.g. https://api-admin.nfluencer.co)
-          VITE_API_BASE_URL: https://api-admin.nfluencer.co
-          VITE_MAIN_APP_URL: https://www.nfluencer.co
-          VITE_DOMAIN: nfluencer.co
+          # Admin microservice URL (e.g. https://api-admin.fanzzer.com)
+          VITE_API_BASE_URL: https://api-admin.fanzzer.com
+          VITE_MAIN_APP_URL: https://www.fanzzer.com
+          VITE_DOMAIN: fanzzer.com
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=nfluencer-dashboard
+          command: pages deploy dist --project-name=fanzzer-dashboard

@@ -5,7 +5,7 @@ export type AdminApiError = {
 
 const getBaseUrl = () => {
   // In production, VITE_ADMIN_API_BASE_URL must point to the admin microservice
-  // e.g. https://api-admin.nfluencer.co
+  // e.g. https://api-admin.fanzzer.com
   const envBase = import.meta.env.VITE_ADMIN_API_BASE_URL as string | undefined;
   if (envBase) {
     return envBase.replace(/\/$/, "");

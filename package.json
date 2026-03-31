@@ -8,8 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "deploy": "npm run build && npx wrangler pages deploy dist --project-name nfluencer-dashboard",
-    "deploy:production": "npm run build && npx wrangler pages deploy dist --project-name nfluencer-dashboard --env production"
+    "deploy": "npm run build && npx wrangler pages deploy dist --project-name fanzzer-dashboard",
+    "deploy:production": "npm run build && npx wrangler pages deploy dist --project-name fanzzer-dashboard --env production"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",

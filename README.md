@@ -1,6 +1,6 @@
-# Nfluencer Dashboard
+# fanzzer Dashboard
 
-Admin dashboard frontend for the nfluencer.co creator monetization platform.
+Admin dashboard frontend for the fanzzer.com creator monetization platform.
 
 ## Architecture
 
@@ -42,16 +42,16 @@ Create `.env.local` for development or `.env.production` for deployment:
 
 ```bash
 # Admin API Base URL - points to admin microservice
-VITE_ADMIN_API_BASE_URL=https://nfluencer-admin.dlouis20.workers.dev
+VITE_ADMIN_API_BASE_URL=https://fanzzer-admin.dlouis20.workers.dev
 
 # Main app URL for navigation  
-VITE_MAIN_APP_URL=https://www.nfluencer.co
+VITE_MAIN_APP_URL=https://www.fanzzer.com
 
 # Clerk authentication
 VITE_CLERK_PUBLISHABLE_KEY=pk_live_your_key_here
 
 # Domain configuration
-VITE_DOMAIN=nfluencer.co
+VITE_DOMAIN=fanzzer.com
 ```
 
 ## Architecture
@@ -76,17 +76,17 @@ Automated via GitHub Actions on push to main branch.
 Manual deployment:
 ```bash
 npm run build
-npx wrangler pages deploy dist --project-name nfluencer-dashboard
+npx wrangler pages deploy dist --project-name fanzzer-dashboard
 ```
 
 ## Live Dashboard
 
-- **Production**: https://main.nfluencer-dashboard.pages.dev
-- **Latest Deployment**: https://4d3dd5ef.nfluencer-dashboard.pages.dev
+- **Production**: https://main.fanzzer-dashboard.pages.dev
+- **Latest Deployment**: https://4d3dd5ef.fanzzer-dashboard.pages.dev
 
 ## Theme
 
-Custom dark-first theme with nfluencer.co branding:
+Custom dark-first theme with fanzzer.com branding:
 - Primary: `#914BF1` (purple)
 - Backgrounds: `#272829`, `#1f1f21`, `#1a1a1f` 
 - Text: `#FFFFFF`, `#D9D9D9`, `#A0A0A0`

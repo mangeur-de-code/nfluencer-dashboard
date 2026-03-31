@@ -1,13 +1,13 @@
-# nfluencer-dashboard — Cloudflare Pages
+# fanzzer-dashboard — Cloudflare Pages
 #
 # Standalone admin dashboard SPA.
 # After first deploy, add custom domain in Cloudflare dashboard:
-# Pages → nfluencer-dashboard → Custom Domains → dashboard.nfluencer.co
+# Pages → fanzzer-dashboard → Custom Domains → dashboard.fanzzer.com
 
-name = "nfluencer-dashboard"
+name = "fanzzer-dashboard"
 pages_build_output_dir = "dist"
 compatibility_date = "2025-09-01"
 
 [env.production.vars]
-VITE_ADMIN_API_BASE_URL = "https://nfluencer-admin.dlouis20.workers.dev"
-VITE_MAIN_APP_URL = "https://www.nfluencer.co"
+VITE_ADMIN_API_BASE_URL = "https://fanzzer-admin.dlouis20.workers.dev"
+VITE_MAIN_APP_URL = "https://www.fanzzer.com"

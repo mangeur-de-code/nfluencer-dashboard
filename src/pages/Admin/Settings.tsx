@@ -13,7 +13,7 @@ type PlatformSettings = {
 
 export default function Settings() {
     const [settings, setSettings] = useState<PlatformSettings>({
-        siteName: "nfluencer",
+        siteName: "fanzzer",
         maintenanceMode: false,
         enableSignups: true,
         creatorVerificationRequired: false,
