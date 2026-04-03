@@ -88,7 +88,7 @@ If you encounter SSL errors when accessing the dashboard immediately after deplo
 
 1. **Test Dashboard Access:** https://3755d521.fanzzer-dashboard.pages.dev
 2. **Verify Admin Integration:** Login and test admin features
-3. **Configure Custom Domains** (optional): dashboard.fanzzer.co
+3. **Configure Custom Domains** (optional): dashboard.fanzzer.com
 4. **Set up monitoring** for both services
 
 ## Current Status
