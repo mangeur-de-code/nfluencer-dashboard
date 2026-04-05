@@ -12,6 +12,7 @@
     "deploy:production": "npm run build && npx wrangler pages deploy dist --project-name fanzzer-dashboard --branch main"
   },
   "dependencies": {
+    "@clerk/react": "^6.1.4",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",

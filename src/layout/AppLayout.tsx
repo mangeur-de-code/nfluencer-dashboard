@@ -1,12 +1,17 @@
 import { SidebarProvider, useSidebar } from "../context/SidebarContext";
 import { AdminDateRangeProvider } from "../context/AdminDateRangeContext";
-import { Outlet } from "react-router";
+import { Outlet, Navigate } from "react-router";
 import AppHeader from "./AppHeader";
 import Backdrop from "./Backdrop";
 import AppSidebar from "./AppSidebar";
+import { useAuth } from "@clerk/react";
 
 const LayoutContent: React.FC = () => {
+  const { isSignedIn, isLoaded } = useAuth();
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+
+  if (!isLoaded) return null;
+  if (!isSignedIn) return <Navigate to="/signin" replace />;
 
   return (
     <div className="min-h-screen xl:flex">

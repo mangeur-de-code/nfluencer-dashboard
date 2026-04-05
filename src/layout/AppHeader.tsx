@@ -4,7 +4,7 @@ import { useSidebar } from "../context/SidebarContext";
 import { useAdminDateRange } from "../context/AdminDateRangeContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import NotificationDropdown from "../components/header/NotificationDropdown";
-import UserDropdown from "../components/header/UserDropdown";
+import { UserButton } from "@clerk/react";
 import { fetchAdmin } from "../lib/adminApi";
 
 type SearchResult = {
@@ -235,7 +235,7 @@ const AppHeader: React.FC = () => {
             <ThemeToggleButton />
             <NotificationDropdown />
           </div>
-          <UserDropdown />
+          <UserButton />
         </div>
       </div>
     </header>
