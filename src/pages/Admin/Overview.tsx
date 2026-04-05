@@ -5,7 +5,7 @@ import SectionCard from "../../components/admin/SectionCard";
 import AreaChart from "../../components/admin/charts/AreaChart";
 import BarChart from "../../components/admin/charts/BarChart";
 import DonutChart from "../../components/admin/charts/DonutChart";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import {
   AlertHexaIcon,
@@ -84,6 +84,7 @@ const fallbackData: OverviewData = {
 };
 
 export default function Overview() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [data, setData] = useState<OverviewData>(fallbackData);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -95,7 +96,7 @@ export default function Overview() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<OverviewData>("/api/admin/overview", {
+        const response = await adminFetch<OverviewData>("/api/admin/overview", {
           start: range.start,
           end: range.end,
           range: range.key,

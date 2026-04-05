@@ -1,6 +1,22 @@
+import { useCallback } from "react";
+import { useAuth } from "@clerk/react";
+
 export type AdminApiError = {
   message: string;
   status?: number;
+};
+
+/**
+ * Hook that returns a fetchAdmin function with the Clerk session token
+ * automatically injected into every request.
+ */
+export const useAdminFetch = () => {
+  const { getToken } = useAuth();
+  return useCallback(
+    <T>(path: string, params?: Record<string, string | number | undefined>) =>
+      getToken().then((token) => fetchAdmin<T>(path, params, token)),
+    [getToken]
+  );
 };
 
 const getBaseUrl = () => {
@@ -11,7 +27,7 @@ const getBaseUrl = () => {
     return envBase.replace(/\/$/, "");
   }
   // Default to production admin service URL
-  return "https://fanzzer-admin.dlouis20.workers.dev";
+  return "https://api-admin.fanzzer.com";
 };
 
 const toQueryString = (params?: Record<string, string | number | undefined>) => {
@@ -25,11 +41,12 @@ const toQueryString = (params?: Record<string, string | number | undefined>) => 
 
 export const fetchAdmin = async <T>(
   path: string,
-  params?: Record<string, string | number | undefined>
+  params?: Record<string, string | number | undefined>,
+  token?: string | null
 ): Promise<T> => {
   const baseUrl = getBaseUrl();
 
-  // For overview data, use the dashboard overview endpoint 
+  // For overview data, use the dashboard overview endpoint
   if (path === "/api/admin/overview" || path === "/api/overview") {
     path = "/dashboard/overview";
   }
@@ -39,7 +56,12 @@ export const fetchAdmin = async <T>(
       "Content-Type": "application/json",
     };
 
-    // Add API key if available
+    // Pass Clerk session token for worker authentication
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Add API key if available (fallback / dev override)
     const apiKey = import.meta.env.VITE_DASHBOARD_API_KEY as string | undefined;
     if (apiKey) {
       headers['X-Dashboard-API-Key'] = apiKey;

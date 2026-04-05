@@ -3,7 +3,7 @@ import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import StatCard from "../../components/admin/StatCard";
 import AreaChart from "../../components/admin/charts/AreaChart";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { DollarLineIcon } from "../../icons";
 
@@ -36,6 +36,7 @@ const fallback: RevenueData = {
 };
 
 export default function Revenue() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [data, setData] = useState<RevenueData>(fallback);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -47,7 +48,7 @@ export default function Revenue() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<RevenueData>("/api/admin/revenue", {
+        const response = await adminFetch<RevenueData>("/api/admin/revenue", {
           start: range.start,
           end: range.end,
           range: range.key,

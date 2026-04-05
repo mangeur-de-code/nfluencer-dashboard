@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { useAuth } from "@clerk/react";
 import { fetchAdmin } from "../lib/adminApi";
 
 export type AdminRole = "super_admin" | "moderator" | "support" | null;
@@ -46,11 +47,13 @@ function derivePermissions(role: AdminRole): Omit<RbacContextValue, "role"> {
 
 export function RbacProvider({ children }: { children: ReactNode }) {
     const [role, setRole] = useState<AdminRole>(null);
+    const { getToken } = useAuth();
 
     useEffect(() => {
         const load = async () => {
             try {
-                const data = await fetchAdmin<{ adminRole: string }>("/api/admin/preferences");
+                const token = await getToken();
+                const data = await fetchAdmin<{ adminRole: string }>("/api/admin/preferences", undefined, token);
                 setRole((data.adminRole as AdminRole) ?? "super_admin");
             } catch {
                 // Default to full access if preference API unavailable
@@ -58,7 +61,7 @@ export function RbacProvider({ children }: { children: ReactNode }) {
             }
         };
         load();
-    }, []);
+    }, [getToken]);
 
     const value: RbacContextValue = {
         role,

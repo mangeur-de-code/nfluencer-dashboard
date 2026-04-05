@@ -3,7 +3,7 @@ import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import StatCard from "../../components/admin/StatCard";
 import AreaChart from "../../components/admin/charts/AreaChart";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { VideoIcon } from "../../icons";
 
@@ -35,6 +35,7 @@ const fallback: StreamData = {
 };
 
 export default function Streams() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [data, setData] = useState<StreamData>(fallback);
   const [_status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -46,7 +47,7 @@ export default function Streams() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<StreamData>("/api/admin/streams", {
+        const response = await adminFetch<StreamData>("/api/admin/streams", {
           start: range.start,
           end: range.end,
           range: range.key,

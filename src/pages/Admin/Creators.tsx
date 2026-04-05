@@ -2,7 +2,7 @@
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import TablePagination from "../../components/admin/TablePagination";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { SearchIcon } from "../../components/icons/SearchIcon";
 import { useSortedPaginatedData, SortIcon, exportToCsv } from "../../hooks/useTableUtils";
@@ -44,6 +44,7 @@ const COLUMNS: { key: keyof CreatorRow; label: string }[] = [
 ];
 
 export default function Creators() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [rows, setRows] = useState<CreatorRow[]>([]);
   const [query, setQuery] = useState("");
@@ -53,7 +54,7 @@ export default function Creators() {
   const loadCreators = async (mounted: { current: boolean }) => {
     setStatus("loading");
     try {
-      const response = await fetchAdmin<{ creators: CreatorRow[] }>("/api/admin/creators", {
+      const response = await adminFetch<{ creators: CreatorRow[] }>("/api/admin/creators", {
         start: range.start, end: range.end, range: range.key,
       });
       if (mounted.current) {
@@ -92,7 +93,7 @@ export default function Creators() {
     if (!globalThis.confirm(message)) return;
     setActionLoading(creatorId);
     try {
-      const res = await fetchAdmin<{ success?: boolean; error?: string }>("/api/admin/creators", {
+      const res = await adminFetch<{ success?: boolean; error?: string }>("/api/admin/creators", {
         method: "POST",
         body: JSON.stringify({ action: "override_kyc", userId: creatorId, kycStatus }),
       });

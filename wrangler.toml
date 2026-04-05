@@ -9,9 +9,9 @@ pages_build_output_dir = "dist"
 compatibility_date = "2025-09-01"
 
 [env.production.vars]
-VITE_ADMIN_API_BASE_URL = "https://fanzzer-admin.dlouis20.workers.dev"
+VITE_ADMIN_API_BASE_URL = "https://api-admin.fanzzer.com"
 VITE_MAIN_APP_URL = "https://www.fanzzer.com"
-VITE_CLERK_PUBLISHABLE_KEY = "pk_test_fake_key_for_demo"
+VITE_CLERK_PUBLISHABLE_KEY = "pk_test_c21hc2hpbmcta2luZ2Zpc2gtNDUuY2xlcmsuYWNjb3VudHMuZGV2JA"
 VITE_DOMAIN = "fanzzer.com"
 CLOUDFLARE_ACCOUNT_ID = "your_account_id"
 CLOUDFLARE_API_TOKEN = "your_api_token"
@@ -19,7 +19,7 @@ RESEND_API_KEY = "your_resend_key"
 
 # Preview environment variables (for testing)
 [env.preview.vars]
-VITE_ADMIN_API_BASE_URL = "https://fanzzer-admin.dlouis20.workers.dev"
+VITE_ADMIN_API_BASE_URL = "https://api-admin.fanzzer.com"
 VITE_MAIN_APP_URL = "https://www.fanzzer.com"
 VITE_DASHBOARD_API_KEY = "dev-key-123"
 VITE_DOMAIN = "fanzzer.com"

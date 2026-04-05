@@ -2,7 +2,7 @@
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import TablePagination from "../../components/admin/TablePagination";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { exportToCsv } from "../../hooks/useTableUtils";
 import {
@@ -104,6 +104,7 @@ function ActionModal({
 }
 
 export default function Reports() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const { slaConfig, filters, saveFilter, deleteFilter } = useSavedFilters("reports");
   const [reports, setReports] = useState<Report[]>([]);
@@ -124,7 +125,7 @@ export default function Reports() {
   const loadReports = async () => {
     setStatus("loading");
     try {
-      const response = await fetchAdmin<{ reports: Report[] }>("/api/admin/reports", {
+      const response = await adminFetch<{ reports: Report[] }>("/api/admin/reports", {
         start: range.start, end: range.end, range: range.key,
       });
       setReports(response.reports || []);

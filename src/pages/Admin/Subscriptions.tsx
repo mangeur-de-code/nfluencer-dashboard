@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import StatCard from "../../components/admin/StatCard";
 import AreaChart from "../../components/admin/charts/AreaChart";
@@ -38,6 +38,7 @@ const fallback: SubscriptionData = {
 };
 
 export default function Subscriptions() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [data, setData] = useState<SubscriptionData>(fallback);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -49,7 +50,7 @@ export default function Subscriptions() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<SubscriptionData>(
+        const response = await adminFetch<SubscriptionData>(
           "/api/admin/subscriptions",
           {
             start: range.start,

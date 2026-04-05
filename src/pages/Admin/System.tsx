@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import StatCard from "../../components/admin/StatCard";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { BoltIcon } from "../../icons";
 
@@ -33,6 +33,7 @@ const fallback: SystemData = {
 };
 
 export default function System() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [data, setData] = useState<SystemData>(fallback);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -44,7 +45,7 @@ export default function System() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<SystemData>("/api/admin/system", {
+        const response = await adminFetch<SystemData>("/api/admin/system", {
           start: range.start,
           end: range.end,
           range: range.key,

@@ -3,7 +3,7 @@ import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import ConfirmModal from "../../components/admin/ConfirmModal";
 import TablePagination from "../../components/admin/TablePagination";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { useRbac } from "../../context/RbacContext";
 import { SearchIcon } from "../../components/icons/SearchIcon";
@@ -38,6 +38,7 @@ const COLUMNS: { key: keyof UserRow; label: string }[] = [
 ];
 
 export default function Users() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const { canModerate } = useRbac();
   const [rows, setRows] = useState<UserRow[]>([]);
@@ -54,7 +55,7 @@ export default function Users() {
     setStatus("loading");
     setSelected(new Set());
     try {
-      const response = await fetchAdmin<{ users: UserRow[] }>("/api/admin/users", {
+      const response = await adminFetch<{ users: UserRow[] }>("/api/admin/users", {
         start: range.start,
         end: range.end,
         range: range.key,

@@ -2,7 +2,7 @@
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import TablePagination from "../../components/admin/TablePagination";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { useSortedPaginatedData, SortIcon, exportToCsv } from "../../hooks/useTableUtils";
 import { SearchIcon } from "../../components/icons/SearchIcon";
@@ -27,6 +27,7 @@ const COLUMNS: { key: keyof AuditEntry; label: string }[] = [
 ];
 
 export default function AuditLog() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [query, setQuery] = useState("");
@@ -37,7 +38,7 @@ export default function AuditLog() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<{ entries: AuditEntry[] }>("/api/admin/audit-log", {
+        const response = await adminFetch<{ entries: AuditEntry[] }>("/api/admin/audit-log", {
           start: range.start, end: range.end, range: range.key,
         });
         if (isMounted) { setEntries(response.entries || []); setStatus("ready"); }

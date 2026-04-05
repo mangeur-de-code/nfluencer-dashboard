@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import DonutChart from "../../components/admin/charts/DonutChart";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 
 
@@ -12,6 +12,7 @@ type ContentSummary = {
 };
 
 export default function Content() {
+  const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
   const [data, setData] = useState<ContentSummary>({ mix: [], topContent: [] });
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
@@ -23,7 +24,7 @@ export default function Content() {
     const load = async () => {
       setStatus("loading");
       try {
-        const response = await fetchAdmin<ContentSummary>(
+        const response = await adminFetch<ContentSummary>(
           "/api/admin/content",
           {
             start: range.start,

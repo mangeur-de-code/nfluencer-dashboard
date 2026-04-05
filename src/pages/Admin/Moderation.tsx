@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import SectionCard from "../../components/admin/SectionCard";
 import StatCard from "../../components/admin/StatCard";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
 import { AlertHexaIcon } from "../../icons";
 
@@ -52,6 +52,7 @@ const fallback: ModerationData = {
 };
 
 export default function Moderation() {
+    const adminFetch = useAdminFetch();
     const { range } = useAdminDateRange();
     const [data, setData] = useState<ModerationData>(fallback);
     const [flags, setFlags] = useState<Flag[]>([]);
@@ -62,12 +63,12 @@ export default function Moderation() {
         setStatus("loading");
         try {
             const [metricsData, flagsData] = await Promise.all([
-                fetchAdmin<ModerationData>("/api/admin/moderation", {
+                adminFetch<ModerationData>("/api/admin/moderation", {
                     start: range.start,
                     end: range.end,
                     range: range.key,
                 }),
-                fetchAdmin<{ flags: Flag[] }>("/api/moderation/flags", { limit: 100 }),
+                adminFetch<{ flags: Flag[] }>("/api/moderation/flags", { limit: 100 }),
             ]);
 
             setData(metricsData);
