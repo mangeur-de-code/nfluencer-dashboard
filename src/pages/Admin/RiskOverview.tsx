@@ -77,10 +77,10 @@ export default function RiskOverview() {
         </div>
 
         {/* Error State */}
-        {status === "error" && error && (
+        {status === "error" && (
           <div className="rounded-2xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20">
             <p className="text-sm text-red-700 dark:text-red-400">
-              Error loading risk metrics: {error}
+              Error loading risk metrics: {error ?? "Unable to reach API"}
             </p>
           </div>
         )}
@@ -240,13 +240,12 @@ export default function RiskOverview() {
                       </div>
                       <div className="ml-4 flex items-center gap-2">
                         <span
-                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                            event.severity === "critical"
+                          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${event.severity === "critical"
                               ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
                               : event.severity === "high"
                                 ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
                                 : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-                          }`}
+                            }`}
                         >
                           {event.severity}
                         </span>
