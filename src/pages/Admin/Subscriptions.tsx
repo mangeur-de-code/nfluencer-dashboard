@@ -131,17 +131,17 @@ export default function Subscriptions() {
         />
         <StatCard
           label="Churn Rate"
-          value={`${metrics.churnRate.toFixed(2)}%`}
+          value={`${(metrics.churnRate ?? 0).toFixed(2)}%`}
           icon={<PieChartIcon className="text-gray-800 size-6 dark:text-white/90" />}
         />
         <StatCard
           label="ARPU"
-          value={`$${metrics.arpu.toFixed(2)}`}
+          value={`$${(metrics.arpu ?? 0).toFixed(2)}`}
           icon={<UserCircleIcon className="text-gray-800 size-6 dark:text-white/90" />}
         />
         <StatCard
           label="LTV"
-          value={`$${metrics.ltv.toFixed(2)}`}
+          value={`$${(metrics.ltv ?? 0).toFixed(2)}`}
           icon={<UserCircleIcon className="text-gray-800 size-6 dark:text-white/90" />}
         />
       </div>

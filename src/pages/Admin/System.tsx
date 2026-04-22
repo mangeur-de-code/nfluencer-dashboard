@@ -87,7 +87,7 @@ export default function System() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="API Error Rate"
-          value={`${metrics.apiErrorRate.toFixed(2)}%`}
+          value={`${(metrics.apiErrorRate ?? 0).toFixed(2)}%`}
           icon={<BoltIcon className="text-gray-800 size-6 dark:text-white/90" />}
         />
         <StatCard

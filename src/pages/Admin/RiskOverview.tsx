@@ -104,11 +104,11 @@ export default function RiskOverview() {
               {/* Dispute Rate */}
               <StatCard
                 label="Dispute Rate"
-                value={`${metrics.disputeRate.toFixed(2)}%`}
+                value={`${(metrics.disputeRate ?? 0).toFixed(2)}%`}
                 icon={<AlertHexaIcon className="text-orange-500" />}
-                trend={metrics.disputeRate > 3 ? "up" : "down"}
+                trend={(metrics.disputeRate ?? 0) > 3 ? "up" : "down"}
                 delta={
-                  metrics.disputeRate > 3
+                  (metrics.disputeRate ?? 0) > 3
                     ? "+Platform at risk"
                     : "Within normal range"
                 }
@@ -118,11 +118,11 @@ export default function RiskOverview() {
               {/* Refund Rate */}
               <StatCard
                 label="Refund Rate"
-                value={`${metrics.refundRate.toFixed(2)}%`}
+                value={`${(metrics.refundRate ?? 0).toFixed(2)}%`}
                 icon={<DollarLineIcon className="text-red-500" />}
-                trend={metrics.refundRate > 5 ? "up" : "down"}
+                trend={(metrics.refundRate ?? 0) > 5 ? "up" : "down"}
                 delta={
-                  metrics.refundRate > 5
+                  (metrics.refundRate ?? 0) > 5
                     ? "+Elevated refunds"
                     : "Normal range"
                 }
@@ -150,9 +150,9 @@ export default function RiskOverview() {
               {/* Pending vs Available Payouts */}
               <StatCard
                 label="Balance Status"
-                value={`$${(metrics.availableBalance / 1000).toFixed(1)}k`}
+                value={`$${((metrics.availableBalance ?? 0) / 1000).toFixed(1)}k`}
                 icon={<DollarLineIcon className="text-green-500" />}
-                delta={`$${(metrics.pendingBalance / 1000).toFixed(1)}k held`}
+                delta={`$${((metrics.pendingBalance ?? 0) / 1000).toFixed(1)}k held`}
                 trend="flat"
                 helper="Available for withdrawal"
               />
