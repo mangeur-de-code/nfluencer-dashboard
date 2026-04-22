@@ -59,7 +59,13 @@ export default function Subscriptions() {
           }
         );
         if (isMounted) {
-          setData(response);
+          setData({
+            metrics: { ...fallback.metrics, ...(response.metrics ?? {}) },
+            series: {
+              newByDay: Array.isArray(response.series?.newByDay) ? response.series.newByDay : [],
+              churnByDay: Array.isArray(response.series?.churnByDay) ? response.series.churnByDay : [],
+            },
+          });
           setStatus("ready");
         }
       } catch (error) {

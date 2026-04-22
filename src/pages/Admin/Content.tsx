@@ -33,7 +33,10 @@ export default function Content() {
           }
         );
         if (isMounted) {
-          setData(response);
+          setData({
+            mix: Array.isArray(response.mix) ? response.mix : [],
+            topContent: Array.isArray(response.topContent) ? response.topContent : [],
+          });
           setStatus("ready");
         }
       } catch (error) {
