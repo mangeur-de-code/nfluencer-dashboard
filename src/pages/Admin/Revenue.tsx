@@ -5,6 +5,7 @@ import StatCard from "../../components/admin/StatCard";
 import AreaChart from "../../components/admin/charts/AreaChart";
 import { useAdminFetch } from "../../lib/adminApi";
 import { useAdminDateRange } from "../../context/AdminDateRangeContext";
+import { useRisk } from "../../context/RiskContext";
 import { DollarLineIcon } from "../../icons";
 
 type RevenueData = {
@@ -38,10 +39,20 @@ const fallback: RevenueData = {
 export default function Revenue() {
   const adminFetch = useAdminFetch();
   const { range } = useAdminDateRange();
+  const {
+    payoutRequests,
+    fetchPayoutRequests,
+    approvePayoutRequest,
+    delayPayoutRequest,
+  } = useRisk();
   const [data, setData] = useState<RevenueData>(fallback);
   const [status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading"
   );
+  const [payoutStatus, setPayoutStatus] = useState<"loading" | "ready" | "error">(
+    "loading"
+  );
+  const [payoutMessage, setPayoutMessage] = useState<string>("");
 
   useEffect(() => {
     let isMounted = true;
@@ -71,6 +82,57 @@ export default function Revenue() {
       isMounted = false;
     };
   }, [range]);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadPayoutRequests = async () => {
+      setPayoutStatus("loading");
+      try {
+        await fetchPayoutRequests();
+        if (isMounted) {
+          setPayoutStatus("ready");
+        }
+      } catch (error) {
+        if (isMounted) {
+          setPayoutStatus("error");
+          setPayoutMessage("Unable to load payout requests.");
+        }
+      }
+    };
+
+    loadPayoutRequests();
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchPayoutRequests]);
+
+  const approvePayout = async (payoutId: string) => {
+    setPayoutStatus("loading");
+    setPayoutMessage("");
+    try {
+      await approvePayoutRequest(payoutId);
+      await fetchPayoutRequests();
+      setPayoutStatus("ready");
+      setPayoutMessage("Payout approved successfully.");
+    } catch (error) {
+      setPayoutStatus("error");
+      setPayoutMessage("Failed to approve payout.");
+    }
+  };
+
+  const delayPayout = async (payoutId: string) => {
+    setPayoutStatus("loading");
+    setPayoutMessage("");
+    try {
+      await delayPayoutRequest(payoutId, "Suspicious activity flagged for review");
+      await fetchPayoutRequests();
+      setPayoutStatus("ready");
+      setPayoutMessage("Payout delayed for additional review.");
+    } catch (error) {
+      setPayoutStatus("error");
+      setPayoutMessage("Failed to delay payout.");
+    }
+  };
 
   const { metrics } = data;
 
@@ -154,6 +216,76 @@ export default function Revenue() {
             <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
               No revenue data available for the selected date range.
             </p>
+          )}
+        </SectionCard>
+      </div>
+
+      <div className="mt-6">
+        <SectionCard
+          title="Payout Risk Controls"
+          subtitle="Review pending payout requests and take action on flagged creator payouts."
+        >
+          {payoutStatus === "loading" ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              Loading payout risk controls...
+            </p>
+          ) : payoutRequests.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400 py-8 text-center">
+              No pending payout requests found.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {payoutMessage ? (
+                <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                  {payoutMessage}
+                </div>
+              ) : null}
+              <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white/80 dark:border-slate-700 dark:bg-slate-950/80">
+                <table className="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-700 dark:divide-slate-700 dark:text-slate-200">
+                  <thead className="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+                    <tr>
+                      <th className="px-4 py-3 font-medium">Creator</th>
+                      <th className="px-4 py-3 font-medium">Amount</th>
+                      <th className="px-4 py-3 font-medium">Risk Score</th>
+                      <th className="px-4 py-3 font-medium">Status</th>
+                      <th className="px-4 py-3 font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                    {payoutRequests.map((request) => (
+                      <tr key={request.id}>
+                        <td className="px-4 py-3">{request.creatorId}</td>
+                        <td className="px-4 py-3">${request.amount.toLocaleString()}</td>
+                        <td className="px-4 py-3">{request.creatorRiskScore}</td>
+                        <td className="px-4 py-3 capitalize text-slate-600 dark:text-slate-300">
+                          {request.status}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => approvePayout(request.id)}
+                              disabled={payoutStatus === "loading"}
+                              className="rounded bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => delayPayout(request.id)}
+                              disabled={payoutStatus === "loading"}
+                              className="rounded border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-amber-500/70 dark:bg-amber-950/30 dark:text-amber-200"
+                            >
+                              Delay
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           )}
         </SectionCard>
       </div>

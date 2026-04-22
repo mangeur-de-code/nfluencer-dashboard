@@ -34,6 +34,11 @@ const navItems: NavItem[] = [
     path: "/",
   },
   {
+    icon: <AlertHexaIcon />,
+    name: "Risk Overview",
+    path: "/risk",
+  },
+  {
     icon: <UserCircleIcon />,
     name: "Users",
     path: "/users",
