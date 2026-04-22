@@ -60,16 +60,18 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(true);
       setError(null);
       try {
-        const events = await fetchAdmin<RiskEvent[]>(
+        const raw = await fetchAdmin<RiskEvent[]>(
           "/api/admin/risk/events",
           { limit }
         );
+        const events = Array.isArray(raw) ? raw : [];
         setRecentRiskEvents(events);
         return events;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to fetch risk events";
         setError(message);
-        throw err;
+        setRecentRiskEvents([]);
+        return [];
       } finally {
         setLoading(false);
       }
@@ -81,15 +83,17 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
     setLoading(true);
     setError(null);
     try {
-      const rules = await fetchAdmin<VelocityRule[]>(
+      const raw = await fetchAdmin<VelocityRule[]>(
         "/api/admin/risk/velocity-rules"
       );
+      const rules = Array.isArray(raw) ? raw : [];
       setVelocityRules(rules);
       return rules;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to fetch velocity rules";
       setError(message);
-      throw err;
+      setVelocityRules([]);
+      return [];
     } finally {
       setLoading(false);
     }
@@ -100,15 +104,17 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(true);
       setError(null);
       try {
-        const thresholds = await fetchAdmin<RiskThreshold[]>(
+        const raw = await fetchAdmin<RiskThreshold[]>(
           "/api/admin/risk/thresholds"
         );
+        const thresholds = Array.isArray(raw) ? raw : [];
         setRiskThresholds(thresholds);
         return thresholds;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to fetch risk thresholds";
         setError(message);
-        throw err;
+        setRiskThresholds([]);
+        return [];
       } finally {
         setLoading(false);
       }
@@ -142,15 +148,17 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(true);
       setError(null);
       try {
-        const requests = await fetchAdmin<PayoutRequest[]>(
+        const raw = await fetchAdmin<PayoutRequest[]>(
           "/api/admin/risk/payout-requests"
         );
+        const requests = Array.isArray(raw) ? raw : [];
         setPayoutRequests(requests);
         return requests;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to fetch payout requests";
         setError(message);
-        throw err;
+        setPayoutRequests([]);
+        return [];
       } finally {
         setLoading(false);
       }
