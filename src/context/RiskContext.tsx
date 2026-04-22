@@ -166,7 +166,7 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         await fetchAdmin<{ success: boolean }>(
           `/api/admin/users/${userId}/freeze`,
-          { method: "POST", body: { reason } }
+          { method: "POST", body: JSON.stringify({ reason }) }
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to freeze user";
@@ -206,7 +206,7 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         await fetchAdmin<{ success: boolean }>(
           `/api/admin/creators/${creatorId}/freeze`,
-          { method: "POST", body: { reason } }
+          { method: "POST", body: JSON.stringify({ reason }) }
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to freeze creator";
@@ -246,7 +246,7 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         await fetchAdmin<{ success: boolean }>(
           `/api/admin/creators/${creatorId}/pause-payouts`,
-          { method: "POST", body: { reason } }
+          { method: "POST", body: JSON.stringify({ reason }) }
         );
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to pause payouts";
@@ -313,7 +313,7 @@ export const RiskProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         await fetchAdmin<{ success: boolean }>(
           `/api/admin/risk/payout-requests/${payoutId}/delay`,
-          { method: "POST", body: { reason } }
+          { method: "POST", body: JSON.stringify({ reason }) }
         );
         setPayoutRequests((prev) =>
           prev.map((request) =>

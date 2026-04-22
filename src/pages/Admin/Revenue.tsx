@@ -265,7 +265,7 @@ export default function Revenue() {
                             <button
                               type="button"
                               onClick={() => approvePayout(request.id)}
-                              disabled={payoutStatus === "loading"}
+                              disabled={payoutStatus !== "ready"}
                               className="rounded bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               Approve
@@ -273,7 +273,7 @@ export default function Revenue() {
                             <button
                               type="button"
                               onClick={() => delayPayout(request.id)}
-                              disabled={payoutStatus === "loading"}
+                              disabled={payoutStatus !== "ready"}
                               className="rounded border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-amber-500/70 dark:bg-amber-950/30 dark:text-amber-200"
                             >
                               Delay

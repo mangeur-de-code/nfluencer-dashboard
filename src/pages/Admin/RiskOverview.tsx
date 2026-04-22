@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import PageMeta from "../../components/common/PageMeta";
 import StatCard from "../../components/admin/StatCard";
 import SectionCard from "../../components/admin/SectionCard";
-import AreaChart from "../../components/admin/charts/AreaChart";
 import { useRisk } from "../../context/RiskContext";
 import {
   AlertHexaIcon,
@@ -11,7 +10,6 @@ import {
   FileIcon,
 } from "../../icons";
 import RiskScoreBadge from "../../components/risk/RiskScoreBadge";
-import { createRiskScore } from "../../types/risk";
 
 /**
  * Risk Overview Dashboard - Real-time fraud & risk control center
@@ -23,7 +21,6 @@ export default function RiskOverview() {
     fetchOverviewMetrics,
     fetchRecentRiskEvents,
     recentRiskEvents,
-    loading,
     error,
   } = useRisk();
 
