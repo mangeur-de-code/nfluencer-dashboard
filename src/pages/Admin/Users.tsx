@@ -25,7 +25,7 @@ type UserRow = {
   status?: string;
 };
 
-type ActionKind = "ban" | "promote" | "delete";
+type ActionKind = "ban" | "promote" | "delete" | "freeze" | "unfreeze";
 
 const COLUMNS: { key: keyof UserRow; label: string }[] = [
   { key: "name", label: "User" },
@@ -45,6 +45,7 @@ export default function Users() {
   const [query, setQuery] = useState(() => readLocalFilter("users", "query", ""));
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [selectedAction, setSelectedAction] = useState<ActionKind>("ban");
   const [confirm, setConfirm] = useState<{ action: ActionKind; ids: number[] } | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
 
@@ -126,7 +127,7 @@ export default function Users() {
   }
 
   async function executeAction(action: ActionKind, ids: number[]) {
-    const endpoints: Record<ActionKind, string> = {
+    const endpoints: Record<Exclude<ActionKind, "freeze" | "unfreeze">, string> = {
       ban: "/api/admin/ban-user",
       promote: "/api/admin/promote-user",
       delete: "/api/admin/delete-user",
@@ -134,13 +135,28 @@ export default function Users() {
     setActionLoading(true);
     try {
       await Promise.all(
-        ids.map((userId) =>
-          fetch(endpoints[action], {
+        ids.map((userId) => {
+          if (action === "freeze") {
+            return fetch(`/api/admin/users/${userId}/freeze`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ reason: "Risk mitigation" }),
+            });
+          }
+
+          if (action === "unfreeze") {
+            return fetch(`/api/admin/users/${userId}/unfreeze`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+
+          return fetch(endpoints[action], {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId }),
-          })
-        )
+          });
+        })
       );
     } finally {
       setActionLoading(false);
@@ -149,6 +165,11 @@ export default function Users() {
       await loadUsers(mounted);
     }
   }
+
+  const applySelectedAction = () => {
+    if (selected.size === 0) return;
+    requestAction(selectedAction, [...selected]);
+  };
 
   function handleExport() {
     exportToCsv(
@@ -165,11 +186,15 @@ export default function Users() {
     ban: "ban",
     promote: "promote to admin",
     delete: "permanently delete",
+    freeze: "freeze account",
+    unfreeze: "unfreeze account",
   };
   const actionVariants: Record<ActionKind, "danger" | "warning" | "info"> = {
     ban: "warning",
     promote: "info",
     delete: "danger",
+    freeze: "danger",
+    unfreeze: "info",
   };
 
   return (
@@ -180,8 +205,18 @@ export default function Users() {
         <ConfirmModal
           isOpen
           title={`${confirm.action.charAt(0).toUpperCase() + confirm.action.slice(1)} ${confirm.ids.length > 1 ? `${confirm.ids.length} users` : "user"}`}
-          message={`Are you sure you want to ${actionLabels[confirm.action]} ${confirm.ids.length > 1 ? `these ${confirm.ids.length} users` : "this user"}? This cannot be undone.`}
-          confirmLabel={confirm.action === "ban" ? "Ban" : confirm.action === "promote" ? "Promote" : "Delete"}
+          message={`Are you sure you want to ${actionLabels[confirm.action]} ${confirm.ids.length > 1 ? `these ${confirm.ids.length} users` : "this user"}?`}
+          confirmLabel={
+            confirm.action === "ban"
+              ? "Ban"
+              : confirm.action === "promote"
+              ? "Promote"
+              : confirm.action === "freeze"
+              ? "Freeze"
+              : confirm.action === "unfreeze"
+              ? "Unfreeze"
+              : "Delete"
+          }
           variant={actionVariants[confirm.action]}
           onConfirm={() => executeAction(confirm.action, confirm.ids)}
           onCancel={() => setConfirm(null)}
@@ -218,13 +253,37 @@ export default function Users() {
       </div>
 
       {selected.size > 0 && canModerate && (
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 dark:border-blue-900/40 dark:bg-blue-900/20">
+        <div className="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/40 dark:bg-blue-900/20">
           <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
             {selected.size} user{selected.size !== 1 ? "s" : ""} selected
           </span>
-          <button onClick={() => requestAction("ban")} disabled={actionLoading} className="rounded px-2.5 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 disabled:opacity-40">Ban</button>
-          <button onClick={() => requestAction("delete")} disabled={actionLoading} className="rounded px-2.5 py-1 text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 disabled:opacity-40">Delete</button>
-          <button onClick={() => setSelected(new Set())} className="ml-auto text-xs text-blue-500 hover:underline dark:text-blue-400">Clear</button>
+          <label className="text-sm text-slate-600 dark:text-slate-300">
+            Action
+            <select
+              value={selectedAction}
+              onChange={(e) => setSelectedAction(e.target.value as ActionKind)}
+              className="ml-2 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-700 shadow-sm outline-none transition focus:border-slate-400 focus:ring-1 focus:ring-slate-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200"
+            >
+              <option value="ban">Ban</option>
+              <option value="promote">Promote to admin</option>
+              <option value="delete">Delete</option>
+              <option value="freeze">Freeze account</option>
+              <option value="unfreeze">Unfreeze account</option>
+            </select>
+          </label>
+          <button
+            onClick={applySelectedAction}
+            disabled={actionLoading}
+            className="rounded bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Apply
+          </button>
+          <button
+            onClick={() => setSelected(new Set())}
+            className="ml-auto text-xs text-blue-500 hover:underline dark:text-blue-400"
+          >
+            Clear
+          </button>
         </div>
       )}
 
