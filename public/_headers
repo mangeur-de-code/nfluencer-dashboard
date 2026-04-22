@@ -1,5 +1,4 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api-admin.fanzzer.com https://clerk.dashboard.fanzzer.com wss://clerk.dashboard.fanzzer.com https://*.clerk.accounts.dev; frame-src https://clerk.dashboard.fanzzer.com https://*.clerk.accounts.dev https://challenges.cloudflare.com; worker-src blob:;
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
