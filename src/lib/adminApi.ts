@@ -13,8 +13,10 @@ export type AdminApiError = {
 export const useAdminFetch = () => {
   const { getToken } = useAuth();
   return useCallback(
-    <T>(path: string, params?: Record<string, string | number | undefined>) =>
-      getToken().then((token) => fetchAdmin<T>(path, params, token)),
+    <T>(
+      path: string,
+      paramsOrInit?: Record<string, string | number | undefined> | RequestInit
+    ) => getToken().then((token) => fetchAdmin<T>(path, paramsOrInit, token)),
     [getToken]
   );
 };
@@ -39,9 +41,22 @@ const toQueryString = (params?: Record<string, string | number | undefined>) => 
   return query ? `?${query}` : "";
 };
 
+const isRequestInit = (
+  value?: Record<string, string | number | undefined> | RequestInit
+): value is RequestInit => {
+  if (!value || typeof value !== "object") return false;
+  return (
+    "method" in value ||
+    "headers" in value ||
+    "body" in value ||
+    "mode" in value ||
+    "cache" in value
+  );
+};
+
 export const fetchAdmin = async <T>(
   path: string,
-  params?: Record<string, string | number | undefined>,
+  paramsOrInit?: Record<string, string | number | undefined> | RequestInit,
   token?: string | null
 ): Promise<T> => {
   const baseUrl = getBaseUrl();
@@ -52,6 +67,10 @@ export const fetchAdmin = async <T>(
   }
 
   try {
+    const isInit = isRequestInit(paramsOrInit);
+    const params = isInit ? undefined : paramsOrInit;
+    const init = isInit ? paramsOrInit : {};
+
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
@@ -67,9 +86,29 @@ export const fetchAdmin = async <T>(
       headers['X-Dashboard-API-Key'] = apiKey;
     }
 
-    const response = await fetch(`${baseUrl}${path}${toQueryString(params)}`, {
-      headers,
-    });
+    const mergedHeaders = {
+      ...headers,
+      ...((init.headers as Record<string, string>) || {}),
+    };
+
+    const body = init.body;
+    const requestInit: RequestInit = {
+      ...init,
+      headers: mergedHeaders,
+    };
+
+    if (body !== undefined && typeof body !== "string") {
+      requestInit.body = JSON.stringify(body);
+    }
+
+    if (!requestInit.method) {
+      requestInit.method = "GET";
+    }
+
+    const response = await fetch(
+      `${baseUrl}${path}${toQueryString(params)}`,
+      requestInit
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
