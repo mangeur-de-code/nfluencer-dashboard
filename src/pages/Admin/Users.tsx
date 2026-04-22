@@ -127,33 +127,28 @@ export default function Users() {
   }
 
   async function executeAction(action: ActionKind, ids: number[]) {
-    const endpoints: Record<Exclude<ActionKind, "freeze" | "unfreeze">, string> = {
-      ban: "/api/admin/ban-user",
-      promote: "/api/admin/promote-user",
-      delete: "/api/admin/delete-user",
-    };
     setActionLoading(true);
     try {
       await Promise.all(
         ids.map((userId) => {
           if (action === "freeze") {
-            return fetch(`/api/admin/users/${userId}/freeze`, {
+            return adminFetch<{ success: boolean }>(`/api/admin/users/${userId}/freeze`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ reason: "Risk mitigation" }),
             });
           }
-
           if (action === "unfreeze") {
-            return fetch(`/api/admin/users/${userId}/unfreeze`, {
+            return adminFetch<{ success: boolean }>(`/api/admin/users/${userId}/unfreeze`, {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
             });
           }
-
-          return fetch(endpoints[action], {
+          const endpoints: Record<Exclude<ActionKind, "freeze" | "unfreeze">, string> = {
+            ban: "/api/admin/ban-user",
+            promote: "/api/admin/promote-user",
+            delete: "/api/admin/delete-user",
+          };
+          return adminFetch<{ success: boolean }>(endpoints[action], {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId }),
           });
         })
@@ -335,7 +330,17 @@ export default function Users() {
                   <td className="px-4 py-3">{row.followers ?? 0}</td>
                   <td className="px-4 py-3">{row.subscribers ?? 0}</td>
                   <td className="px-4 py-3">{row.totalSpend ? `$${row.totalSpend.toLocaleString()}` : "—"}</td>
-                  <td className="px-4 py-3 capitalize">{row.status ?? "active"}</td>
+                  <td className="px-4 py-3">
+                    {(() => {
+                      const s = row.status ?? "active";
+                      const cls =
+                        s === "banned" ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300" :
+                        s === "frozen" ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300" :
+                        s === "admin"  ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300" :
+                        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
+                      return <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium capitalize ${cls}`}>{s}</span>;
+                    })()}
+                  </td>
                   <td className="px-4 py-3">{row.createdAt}</td>
                   <td className="px-4 py-3">
                     {canModerate ? (

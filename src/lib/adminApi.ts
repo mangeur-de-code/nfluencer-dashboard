@@ -187,6 +187,20 @@ export const fetchAdmin = async <T>(
       } as T;
     }
 
+    // Fallback for notifications endpoint
+    if (path === "/api/admin/notifications") {
+      return {
+        counts: {
+          openReports: 0,
+          pendingVerifications: 0,
+          pendingPayouts: 0,
+          pendingPayoutAmount: 0,
+        },
+        hasAlerts: false,
+        notifications: [],
+      } as T;
+    }
+
     // For other endpoints, throw the error
     const apiError: AdminApiError = {
       message: "API temporarily unavailable - using demo data",
