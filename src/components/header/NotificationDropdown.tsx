@@ -2,7 +2,7 @@
 import { Link } from "react-router";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 
 type AdminNotification = {
   id: string;
@@ -57,6 +57,7 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function NotificationDropdown() {
+  const fetchAdmin = useAdminFetch();
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<NotificationsData | null>(null);
   const [seen, setSeen] = useState(false);
@@ -77,7 +78,7 @@ export default function NotificationDropdown() {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []);
+  }, [fetchAdmin]);
 
   const hasAlerts = !seen && (data?.hasAlerts ?? false);
 

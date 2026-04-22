@@ -5,7 +5,7 @@ import { useAdminDateRange } from "../context/AdminDateRangeContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import NotificationDropdown from "../components/header/NotificationDropdown";
 import { UserButton } from "@clerk/react";
-import { fetchAdmin } from "../lib/adminApi";
+import { useAdminFetch } from "../lib/adminApi";
 
 type SearchResult = {
   users: Array<{ id: number; name: string; email: string; role: string }>;
@@ -14,6 +14,7 @@ type SearchResult = {
 };
 
 const AppHeader: React.FC = () => {
+  const fetchAdmin = useAdminFetch();
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { rangeKey, setRangeKey, options } = useAdminDateRange();
