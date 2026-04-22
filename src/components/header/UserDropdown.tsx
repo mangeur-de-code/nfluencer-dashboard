@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { Link } from "react-router";
-import { fetchAdmin } from "../../lib/adminApi";
+import { useAdminFetch } from "../../lib/adminApi";
 
 type AdminUser = {
   id: number;
@@ -13,6 +13,7 @@ type AdminUser = {
 };
 
 export default function UserDropdown() {
+  const fetchAdmin = useAdminFetch();
   const [isOpen, setIsOpen] = useState(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
 
@@ -20,16 +21,14 @@ export default function UserDropdown() {
     const loadAdminUser = async () => {
       try {
         const user = await fetchAdmin<AdminUser>("/api/admin/me");
-        console.log("[UserDropdown] Loaded admin user:", user);
         setAdminUser(user);
-      } catch (error) {
-        console.error("[UserDropdown] Failed to load admin user:", error);
+      } catch {
         setAdminUser(null);
       }
     };
 
     loadAdminUser();
-  }, []);
+  }, [fetchAdmin]);
 
   function toggleDropdown() {
     setIsOpen(!isOpen);

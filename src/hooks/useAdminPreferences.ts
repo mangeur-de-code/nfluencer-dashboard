@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { fetchAdmin } from "../lib/adminApi";
+import { useAdminFetch } from "../lib/adminApi";
 
 export type SavedFilter = {
     id: number;
@@ -50,6 +50,7 @@ export function readLocalFilter(page: string, key: string, defaultValue: string)
 
 /** Hook to load and manage server-side saved filters for a given admin page. */
 export function useSavedFilters(page: string) {
+    const fetchAdmin = useAdminFetch();
     const [filters, setFilters] = useState<SavedFilter[]>([]);
     const [slaConfig, setSlaConfig] = useState<SlaConfig[]>([]);
     const [adminRole, setAdminRole] = useState<string>("super_admin");
@@ -61,13 +62,13 @@ export function useSavedFilters(page: string) {
                 slaConfig: SlaConfig[];
                 adminRole: string;
             }>("/api/admin/preferences", { page });
-            setFilters(data.filters);
-            setSlaConfig(data.slaConfig);
-            setAdminRole(data.adminRole);
+            setFilters(data.filters ?? []);
+            setSlaConfig(data.slaConfig ?? []);
+            setAdminRole(data.adminRole ?? "super_admin");
         } catch {
             // API might not be accessible yet — leave defaults
         }
-    }, [page]);
+    }, [fetchAdmin, page]);
 
     useEffect(() => { load(); }, [load]);
 
